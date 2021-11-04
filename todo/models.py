@@ -9,6 +9,7 @@ class Instituicao(models.Model):
   descricao = models.CharField("Descrição", max_length = 500)
   sobre = models.CharField("Sobre", max_length = 1000, default="")
   email = models.CharField("E-mail", max_length = 100, default="")
+  produtos = models.ManyToManyField("Produto", verbose_name="Produtos")
   def __str__(self):
     return self.nome
   class Meta:
@@ -67,3 +68,10 @@ class Cesta(models.Model):
   class Meta:
       verbose_name = "Cesta"
       verbose_name_plural = "Cestas"
+
+class Contato(models.Model):
+  nome = models.CharField("Nome", max_length = 100)
+  email = models.CharField("E-mail", max_length = 100)
+  telefone = models.CharField("Telefone", max_length=100)
+  mensagem = models.CharField("Descrição", max_length = 500)
+  
