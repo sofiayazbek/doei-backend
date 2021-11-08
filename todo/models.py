@@ -10,6 +10,7 @@ class Instituicao(models.Model):
   sobre = models.CharField("Sobre", max_length = 1000, default="")
   email = models.CharField("E-mail", max_length = 100, default="")
   produtos = models.ManyToManyField("Produto", verbose_name="Produtos")
+  fotoCapa = models.ImageField(upload_to='instituicoes', max_length=255, null=True)
   def __str__(self):
     return self.nome
   class Meta:
