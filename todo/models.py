@@ -73,6 +73,7 @@ class Contato(models.Model):
   nome = models.CharField("Nome", max_length = 100)
   email = models.CharField("E-mail", max_length = 100)
   telefone = models.CharField("Telefone", max_length=100)
+  assunto = models.ForeignKey('Assunto', on_delete=models.PROTECT, verbose_name="Assunto", null=True)
   mensagem = models.CharField("Mensagem", max_length = 1000)
 
   def __str__(self):
@@ -80,4 +81,13 @@ class Contato(models.Model):
   class Meta:
     verbose_name = "Contato"
     verbose_name_plural = "Contatos"
+
+class Assunto(models.Model):
+  nome = models.CharField("Nome", max_length=255)
+  
+  def __str__(self):
+      return self.nome
+  class Meta:
+      verbose_name = "Assunto"
+      verbose_name_plural = "Assuntos" 
   

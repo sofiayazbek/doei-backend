@@ -16,6 +16,8 @@ from django.contrib import admin
 from django.urls import path, include
 from todo.views import todoView, addTodo, deleteTodo, coverImage
 from todo.api import router
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),    
@@ -24,4 +26,4 @@ urlpatterns = [
     path('deleteTodo/<int:todo_id>/', deleteTodo),
     path('app.png', coverImage),
     path('api/', include(router.urls))
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

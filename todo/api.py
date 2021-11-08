@@ -1,5 +1,5 @@
 
-from todo.models import Duvida, Instituicao, Produto, Doador, Contato
+from todo.models import Duvida, Instituicao, Produto, Doador, Contato, Assunto
 
 from rest_framework import routers, serializers, viewsets, mixins
 
@@ -47,15 +47,28 @@ class CreateDoadorViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateDoadorSerializer   
   queryset = Doador.objects.all()
 
+# Serializers define the API representation.
+class AssuntoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assunto
+        fields = ['id', 'nome']
+
+# ViewSets define the view behavior.
+class AssuntoViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Assunto.objects.all().order_by('nome')
+    serializer_class = AssuntoSerializer
+
 #Contato
 class CreateContatoSerializer(serializers.ModelSerializer):
+    assunto: AssuntoSerializer()
     class Meta:
         model = Contato
-        fields = ['id', 'nome', 'email', 'telefone', 'mensagem']
+        fields = ['id', 'nome', 'email', 'telefone', 'mensagem', 'assunto']
 
 class CreateContatoViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateContatoSerializer   
   queryset = Contato.objects.all()
+
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -63,3 +76,6 @@ router.register(r'duvidas', DuvidaViewSet)
 router.register(r'instituicoes', InstituicaoViewSet)
 router.register(r'doadores-create', CreateDoadorViewSet)
 router.register(r'contatos-create', CreateContatoViewSet)
+router.register(r'assuntos', AssuntoViewSet)
+
+  

@@ -125,3 +125,8 @@ X_FRAME_OPTIONS = '*'
 CORS_ALLOWED_ORIGINS = [
     "https://site-doei.sofiaainhoa.repl.co"
 ]
+
+#Configuração de upload
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
