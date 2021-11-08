@@ -30,7 +30,7 @@ class InstituicaoSerializer(serializers.ModelSerializer):
     produtos = ProdutoSerializer(many=True, read_only=True)
     class Meta:
         model = Instituicao
-        fields = ['id', 'nome', 'descricao', 'sobre','produtos']
+        fields = ['id', 'nome', 'descricao', 'sobre','produtos', 'fotoCapa']
 
 # ViewSets define the view behavior.
 class InstituicaoViewSet(viewsets.ReadOnlyModelViewSet):
