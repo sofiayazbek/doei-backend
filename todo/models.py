@@ -73,5 +73,11 @@ class Contato(models.Model):
   nome = models.CharField("Nome", max_length = 100)
   email = models.CharField("E-mail", max_length = 100)
   telefone = models.CharField("Telefone", max_length=100)
-  mensagem = models.CharField("Descrição", max_length = 500)
+  mensagem = models.CharField("Mensagem", max_length = 1000)
+
+  def __str__(self):
+    return f"{self.nome} - {self.email} - {self.telefone}"
+  class Meta:
+    verbose_name = "Contato"
+    verbose_name_plural = "Contatos"
   
