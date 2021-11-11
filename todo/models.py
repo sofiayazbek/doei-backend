@@ -22,6 +22,7 @@ class Produto(models.Model):
   descricao = models.TextField("Descrição")
   preco = models.IntegerField("Preço")
   disponivel = models.CharField("Disponível", max_length = 50)
+  fotoCapa = models.ImageField(upload_to='produtos', max_length=255, null=True)
   def __str__(self):
     return self.nome
   class Meta:
