@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from functools import reduce
 
 User = get_user_model()
 
@@ -32,13 +33,7 @@ class Produto(models.Model):
     verbose_name = "Produto"
     verbose_name_plural = "Produtos"
 
-class Item(models.Model):
-  quantidade = models.IntegerField("Quantidade")
-  def __str__(self):
-    return self.quantidade
-  class Meta:
-    verbose_name = "Item"
-    verbose_name_plural = "Itens"
+
 
 class Doador(models.Model):
   nome = models.CharField("Nome", max_length = 100)
@@ -65,14 +60,31 @@ class Duvida(models.Model):
       verbose_name_plural = "Dúvidas frequentes"
 
 
-class Cesta(models.Model):
-  total = models.IntegerField("Total")
-  data = models.DateField("Data de entrega para a Instituição")
-  def __str__(self):
-      return str(self.total)
-  class Meta:
-      verbose_name = "Cesta"
-      verbose_name_plural = "Cestas"
+class Pedido(models.Model):
+  doador = models.ForeignKey(Doador, on_delete=models.PROTECT, verbose_name="Doador", null=True)
+  finalizado = models.BooleanField()
+
+  @property
+  def itens(self):
+    return Item.objects.filter(pedido=self)
+
+  @property
+  def valorTotal(self):
+    #busca os itens deste pedido
+    itens = list(Item.objects.filter(pedido=self))
+
+    #soma os valores dos itens no pedido
+    return reduce(lambda x, y: x + y, list(map(lambda item: item.preco, itens)), 0)
+
+class Item(models.Model):
+  pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, verbose_name="Pedido", null=True)
+  produto = models.ForeignKey(Produto, on_delete=models.PROTECT, verbose_name="Produto", null=True)
+  quantidade = models.IntegerField(default=1)
+
+  @property
+  def preco(self):
+    return self.produto.preco * self.quantidade
+
 
 class Contato(models.Model):
   nome = models.CharField("Nome", max_length = 100)
@@ -95,4 +107,5 @@ class Assunto(models.Model):
   class Meta:
       verbose_name = "Assunto"
       verbose_name_plural = "Assuntos" 
-  
+
+

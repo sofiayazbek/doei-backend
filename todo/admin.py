@@ -6,7 +6,7 @@ from .models import Produto
 from .models import Instituicao
 from .models import Doador
 from .models import Duvida
-from .models import Cesta
+from .models import Pedido
 from .models import Contato
 from .models import Assunto
 
@@ -15,6 +15,6 @@ admin.site.register(Produto)
 admin.site.register(Instituicao)
 admin.site.register(Doador)
 admin.site.register(Duvida)
-admin.site.register(Cesta)
+admin.site.register(Pedido)
 admin.site.register(Contato)
 admin.site.register(Assunto)

@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 #from django.contrib.auth import authenticate, user_logged_in
 from django.contrib.auth import authenticate, login, logout
-from todo.models import Duvida, Instituicao, Produto, Doador, Contato, Assunto
+from todo.models import Duvida, Instituicao, Produto, Doador, Contato, Assunto, Pedido, Item
 
 
 # Serializers define the API representation.
@@ -58,7 +58,7 @@ class CreateDoadorViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   queryset = Doador.objects.all()
 
   def perform_create(self, serializer):
-    serializer.save(user = self.request.user
+    serializer.save(user = self.request.user)
 
 
 # Serializers define the API representation.
@@ -82,6 +82,55 @@ class CreateContatoSerializer(serializers.ModelSerializer):
 class CreateContatoViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateContatoSerializer   
   queryset = Contato.objects.all()
+
+
+#### Pedidos, Carrinho de compras ###########
+class ItemSerializer(serializers.ModelSerializer):
+    produto: ProdutoSerializer()
+    class Meta:
+        model = Item
+        depth = 2
+        fields = ['id', 'preco', 'produto', 'quantidade']
+
+class PedidoSerializer(serializers.ModelSerializer):
+    itens = ItemSerializer(many=True)
+    class Meta:
+        model = Pedido
+        depth = 2
+        fields = ['id', 'finalizado', 'valorTotal', 'itens']
+
+class PedidoViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PedidoSerializer      
+    def get_queryset(self):
+      #filtra apenas os pedidos do usuário logado
+      return Pedido.objects.filter(doador = Doador.objects.filter(user = self.request.user)[0])    
+
+class CreateItemSerializer(serializers.ModelSerializer):
+    produto: ProdutoSerializer()
+    class Meta:
+        model = Item
+        fields = ['id', 'produto', 'pedido']
+
+class CreateItemPedidoViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+  serializer_class = CreateItemSerializer   
+  queryset = Item.objects.all()
+
+  def perform_create(self, serializer):
+    #procura o pedido aberto
+    pedidosAbertos = Pedido.objects.filter(finalizado = False, doador = Doador.objects.filter(user = self.request.user)[0])    
+    if(len(pedidosAbertos) > 0):
+      pedidoAberto = pedidosAbertos[0]
+    else:
+      #caso nao exista um pedido aberto ele cria um
+      pedidoAberto = Pedido.objects.create(doador = Doador.objects.filter(user = self.request.user)[0], finalizado = False)
+
+    #itensExistente = list(Item.objects.filter(produto=serializer.data['produto'], pedido=pedidoAberto))
+    #if len(itensExistente) > 0:
+    #  itensExistente[0].quantidade = itensExistente[0].quantidade + 1
+    #  itensExistente[0].save()
+    #else:
+    serializer.save(pedido = pedidoAberto) 
+#################  
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -154,6 +203,8 @@ router.register(r'instituicoes', InstituicaoViewSet)
 router.register(r'doadores-create', CreateDoadorViewSet)
 router.register(r'contatos-create', CreateContatoViewSet)
 router.register(r'assuntos', AssuntoViewSet)
+router.register(r'pedidos', PedidoViewSet, basename='Pedidos')
+router.register(r'item-pedido-create', CreateItemPedidoViewSet)
 router.register(r'currentuser', UserDetailsViewSet, basename="Currentuser")
 router.register(r'login', LoginViewSet, basename="Login")
 router.register(r'logout', LogoutViewSet, basename="Logout")
