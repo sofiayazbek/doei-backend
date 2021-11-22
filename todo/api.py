@@ -51,11 +51,15 @@ class InstituicaoViewSet(viewsets.ReadOnlyModelViewSet):
 class CreateDoadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doador
-        fields = ['id', 'nome','sobrenome', 'email', 'data', 'senha']
+        fields = ['id', 'nome','sobrenome', 'email', 'data', 'user']
 
 class CreateDoadorViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateDoadorSerializer   
   queryset = Doador.objects.all()
+
+  def perform_create(self, serializer):
+    serializer.save(user = self.request.user
+
 
 # Serializers define the API representation.
 class AssuntoSerializer(serializers.ModelSerializer):
