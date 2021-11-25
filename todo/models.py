@@ -64,6 +64,9 @@ class Pedido(models.Model):
   doador = models.ForeignKey(Doador, on_delete=models.PROTECT, verbose_name="Doador", null=True)
   finalizado = models.BooleanField()
 
+  def __str__(self):
+      return "Pedido N " + str(self.id)
+
   @property
   def itens(self):
     return Item.objects.filter(pedido=self)

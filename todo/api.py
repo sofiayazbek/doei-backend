@@ -77,11 +77,27 @@ class CreateContatoSerializer(serializers.ModelSerializer):
     assunto: AssuntoSerializer()
     class Meta:
         model = Contato
-        fields = ['id', 'nome', 'email', 'telefone', 'mensagem', 'assunto']
+        fields = ['id', 'nome','sobrenome', 'email']
 
 class CreateContatoViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateContatoSerializer   
   queryset = Contato.objects.all()
+
+
+# Serializers define the API representation.
+class DoadorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doador
+        fields = ['id', 'nome','sobrenome', 'email']
+
+class DoadorDetailsViewSet(ViewSet):
+  serializer_class = DoadorSerializer
+  permission_classes = [IsAuthenticated]
+  @staticmethod
+  def list(request: Request) -> Response:
+    doador = Doador.objects.filter(user = request.user)[0]
+    serializer = DoadorSerializer(doador, many=False)
+    return Response(serializer.data)  
 
 
 #### Pedidos, Carrinho de compras ###########
@@ -154,6 +170,7 @@ class UserRegistrationViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
   serializer_class = UserRegistrationSerializer  
 
 
+
 class LoginViewSet(ViewSet):
   @staticmethod
   def create(request: Request) -> Response:
@@ -163,7 +180,7 @@ class LoginViewSet(ViewSet):
 
       if user is not None:
         login(request, user)
-        return JsonResponse({"detail": "Success"})
+        return JsonResponse({"id": user.id, "username": user.username})
       else:
         return JsonResponse(
             {"detail": "Invalid credentials"},
@@ -206,6 +223,7 @@ router.register(r'assuntos', AssuntoViewSet)
 router.register(r'pedidos', PedidoViewSet, basename='Pedidos')
 router.register(r'item-pedido-create', CreateItemPedidoViewSet)
 router.register(r'currentuser', UserDetailsViewSet, basename="Currentuser")
+router.register(r'currentdoador', DoadorDetailsViewSet, basename="Doadorusuario")
 router.register(r'login', LoginViewSet, basename="Login")
 router.register(r'logout', LogoutViewSet, basename="Logout")
 router.register(r'user-registration', UserRegistrationViewSet, basename="User")
