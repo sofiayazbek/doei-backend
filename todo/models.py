@@ -81,6 +81,7 @@ class Pedido(models.Model):
 
 class Item(models.Model):
   pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, verbose_name="Pedido", null=True)
+  instituicao = models.ForeignKey(Instituicao, on_delete=models.PROTECT, verbose_name="Instituicao", null=True)
   produto = models.ForeignKey(Produto, on_delete=models.PROTECT, verbose_name="Produto", null=True)
   quantidade = models.IntegerField(default=1)
 

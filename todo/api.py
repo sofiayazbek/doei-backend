@@ -103,10 +103,11 @@ class DoadorDetailsViewSet(ViewSet):
 #### Pedidos, Carrinho de compras ###########
 class ItemSerializer(serializers.ModelSerializer):
     produto: ProdutoSerializer()
+    instituicao: InstituicaoSerializer()
     class Meta:
         model = Item
         depth = 2
-        fields = ['id', 'preco', 'produto', 'quantidade']
+        fields = ['id', 'preco', 'produto', 'quantidade', 'instituicao']
 
 class PedidoSerializer(serializers.ModelSerializer):
     itens = ItemSerializer(many=True)
@@ -119,13 +120,20 @@ class PedidoViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PedidoSerializer      
     def get_queryset(self):
       #filtra apenas os pedidos do usuário logado
-      return Pedido.objects.filter(doador = Doador.objects.filter(user = self.request.user)[0])    
+      return Pedido.objects.filter(finalizado=False, doador = Doador.objects.filter(user = self.request.user)[0])    
+
+class PedidoFinalizadoViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PedidoSerializer      
+    def get_queryset(self):
+      #filtra apenas os pedidos do usuário logado
+      return Pedido.objects.filter(finalizado=True, doador = Doador.objects.filter(user = self.request.user)[0])    
+
 
 class CreateItemSerializer(serializers.ModelSerializer):
     produto: ProdutoSerializer()
     class Meta:
         model = Item
-        fields = ['id', 'produto', 'pedido']
+        fields = ['id', 'produto', 'pedido', 'instituicao']
 
 class CreateItemPedidoViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
   serializer_class = CreateItemSerializer   
@@ -221,6 +229,7 @@ router.register(r'doadores-create', CreateDoadorViewSet)
 router.register(r'contatos-create', CreateContatoViewSet)
 router.register(r'assuntos', AssuntoViewSet)
 router.register(r'pedidos', PedidoViewSet, basename='Pedidos')
+router.register(r'pedidos-finalizado', PedidoFinalizadoViewSet, basename='PedidosFinalizado')
 router.register(r'item-pedido-create', CreateItemPedidoViewSet)
 router.register(r'currentuser', UserDetailsViewSet, basename="Currentuser")
 router.register(r'currentdoador', DoadorDetailsViewSet, basename="Doadorusuario")
